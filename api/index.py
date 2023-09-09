@@ -5,6 +5,7 @@ Website
 import smtplib
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS
 
 from .config import EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY
 
@@ -14,6 +15,12 @@ from .config import EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = SECRET_KEY
+
+CORS(app, resources={
+     r"/contact": {"origins": ["http://localhost:5173",
+                               "https://vivirgros.com"]}})
+
+# routes
 
 
 @app.route('/')
