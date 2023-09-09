@@ -54,46 +54,52 @@ def send_mail():
     data = request.get_json()
 
     if data:
-        company_name = data["companyName"]
-        your_name = data["yourName"]
-        phone_number = data["phoneNumber"]
-        email_address = data["emailAddress"]
-        project_details = data["projectDetails"]
+        try:
+            company_name = data["companyName"]
+            your_name = data["yourName"]
+            phone_number = data["phoneNumber"]
+            email_address = data["emailAddress"]
+            project_details = data["projectDetails"]
 
-        mail_subject = "A Message from Vivirgros Contact Page"
-        mail_message = f"""\
-        This message is from Vivirgros Contact Page
+            mail_subject = "A Message from Vivirgros Contact Page"
+            mail_message = f"""\
+            This message is from Vivirgros Contact Page
 
-        Message Details Below:
+            Message Details Below:
 
-            Company Name: {company_name}
+                Company Name: {company_name}
 
-            Client Name: {your_name}
+                Client Name: {your_name}
 
-            Mobile Number: {phone_number}
+                Mobile Number: {phone_number}
 
-            Email Address: {email_address}
+                Email Address: {email_address}
 
-            Message: {project_details}"""
+                Message: {project_details}"""
 
-        email = EMAIL_ADDRESS
-        password = EMAIL_PASSWORD
-        to = EMAIL_ADDRESS
+            email = EMAIL_ADDRESS
+            password = EMAIL_PASSWORD
+            to = EMAIL_ADDRESS
 
-        with smtplib.SMTP_SSL('mail.'+EMAIL_HOST, 465) as smtp:
+            with smtplib.SMTP_SSL('mail.'+EMAIL_HOST, 465) as smtp:
 
-            smtp.login(email, password)
+                smtp.login(email, password)
 
-            subject = mail_subject
-            body = mail_message
+                subject = mail_subject
+                body = mail_message
 
-            msg = f"Subject: {subject}\n\n{body}"
+                msg = f"Subject: {subject}\n\n{body}"
 
-            smtp.sendmail(email, to, msg)
+                smtp.sendmail(email, to, msg)
 
-        return jsonify({
-            'Message': 'Sent Successfully',
-        })
+            return jsonify({
+                'Message': 'Sent Successfully',
+            })
+        except Exception:
+            print(Exception)
+
+            # Return an error response as JSON
+            return jsonify({'Message': 'Failed to send'}), 500
 
     else:
         print(Exception)
