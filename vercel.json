@@ -1,7 +1,7 @@
 {
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api/config" },
     { "source": "/(.*)", "destination": "/api/index" },
-    { "source": "/(.*)", "destination": "/api/models" }
+    { "source": "/(.*)", "destination": "/api/" },
+    { "source": "/(.*)", "destination": "/" }
   ]
 }
