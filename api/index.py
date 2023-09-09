@@ -4,26 +4,55 @@ Website
 """
 
 
+import os
 # imports
 import smtplib
 
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
-from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, ENV,
-                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
-                     SQLALCHEMY_MODIFICATIONS_TRACKS)
-from .models import db
+# from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, ENV,
+#                      SECRET_KEY, SQLALCHEMY_DATABASE_URI,
+#                      SQLALCHEMY_MODIFICATIONS_TRACKS)
+# from .models import db
 
 # configurations
 
 app = Flask(__name__)
 
+load_dotenv()
+SECRET_KEY = os.getenv('SECRET_KEY')
+USER_NAME = os.getenv('USER_NAME')
+PASSWORD = os.getenv('PASSWORD')
+DB_NAME = os.getenv('DB_NAME')
+HOST = os.getenv('HOST')
+PORT = os.getenv('PORT')
+ENV = os.getenv('ENV')
+
+EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+
+
+# Enable debug mode.
+
+DEBUG = True
+
+# Connect to the database
+
+SQLALCHEMY_DATABASE_URI = f'postgresql://{USER_NAME}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}'  # noqa
+SQLALCHEMY_MODIFICATIONS_TRACKS = False
+
 app.config['SECRET_KEY'] = SECRET_KEY
 
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_MODIFICATIONS_TRACKS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
+
+db = SQLAlchemy()
 
 db.init_app(app)
 db.app = (app)
@@ -34,6 +63,16 @@ CORS(app, resources={
                                "https://vivirgros.com"]}})
 
 env = ENV
+
+# models
+
+
+class Author(db.Model):
+    """ Author Model """
+    __tablename__ = "authors"
+
+    id = db.Column(db.Integer, primary_key=True)
+
 
 # routes
 
