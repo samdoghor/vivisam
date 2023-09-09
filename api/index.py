@@ -5,11 +5,14 @@ Website
 
 
 from flask import Flask
+from .config import SECRET_KEY
 
 # configurations
 
 
 app = Flask(__name__)
+
+app.config['SECRET_KEY'] = SECRET_KEY
 
 
 @app.route('/')
