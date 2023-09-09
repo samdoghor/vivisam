@@ -6,13 +6,14 @@ Website
 
 from flask import Flask
 from flask_migrate import Migrate
-
-from .models import db
+from flask_sqlalchemy import SQLAlchemy
 
 # configurations
 
 
 app = Flask(__name__)
+
+db = SQLAlchemy()
 
 db.init_app(app)
 db.app = (app)
