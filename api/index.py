@@ -7,20 +7,23 @@ Website
 # imports
 import smtplib
 
-import config
-from flask import Flask, request, jsonify
-from flask_migrate import Migrate
-from models import db
+from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_migrate import Migrate
+
+from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, ENV,
+                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
+                     SQLALCHEMY_MODIFICATIONS_TRACKS)
+from .models import db
 
 # configurations
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = config.SECRET_KEY
+app.config['SECRET_KEY'] = SECRET_KEY
 
-app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
-app.config['SQLALCHEMY_MODIFICATIONS_TRACKS'] = config.SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
+app.config['SQLALCHEMY_MODIFICATIONS_TRACKS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
 
 db.init_app(app)
 db.app = (app)
@@ -30,7 +33,7 @@ CORS(app, resources={
      r"/contact": {"origins": ["http://localhost:5173",
                                "https://vivirgros.com"]}})
 
-env = config.ENV
+env = ENV
 
 # routes
 
@@ -73,11 +76,11 @@ def send_mail():
 
             Message: {project_details}"""
 
-        email = config.EMAIL_ADDRESS
-        password = config.EMAIL_PASSWORD
-        to = config.EMAIL_ADDRESS
+        email = EMAIL_ADDRESS
+        password = EMAIL_PASSWORD
+        to = EMAIL_ADDRESS
 
-        with smtplib.SMTP_SSL('mail.'+config.EMAIL_HOST, 465) as smtp:
+        with smtplib.SMTP_SSL('mail.'+EMAIL_HOST, 465) as smtp:
 
             smtp.login(email, password)
 
