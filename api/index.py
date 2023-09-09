@@ -38,34 +38,6 @@ CORS(app, resources={
 # routes
 
 
-@app.route('/')
-def home():
-    """ The funtion returns a 200 Ok to show app is running """
-
-    data = {
-        'Status': '200 Ok',
-        'Message': 'App is running'
-    }
-
-    if data:
-        try:
-            return jsonify({
-                'Status': '200 Ok',
-                'Message': 'App is runnung',
-            }), 200
-        except Exception:
-            return jsonify({
-                'Status': '500 Internal Server Error',
-                'Message': 'App is not runnung',
-            }), 500
-
-    else:
-        return jsonify({
-            'Status': '500 Internal Server Error',
-            'Message': 'App is not runnung',
-        }), 500
-
-
 @app.route('/contact', methods=['GET', 'POST'])
 def send_mail():
     """ This function sends mail in contact page for Vivirgros """
