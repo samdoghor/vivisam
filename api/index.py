@@ -13,8 +13,9 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 
-from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY,
-                     SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)
+from .config import (DEBUG, EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,
+                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
+                     SQLALCHEMY_MODIFICATIONS_TRACKS)
 from .models import db
 
 # configurations
@@ -26,6 +27,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
 app.config['SQLALCHEMY_MODIFICATIONS_TRACKS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
 
+debug_mode = DEBUG
+
 db.init_app(app)
 db.app = (app)
 migrate = Migrate(app, db)
@@ -36,6 +39,34 @@ CORS(app, resources={
 
 
 # routes
+
+
+@app.route('/')
+def home():
+    """ The funtion returns a 200 Ok to show app is running """
+
+    data = {
+        'Status': '200 Ok',
+        'Message': 'App is running'
+    }
+
+    if data:
+        try:
+            return jsonify({
+                'Status': '200 Ok',
+                'Message': 'App is runnung',
+            }), 200
+        except Exception:
+            return jsonify({
+                'Status': '500 Internal Server Error',
+                'Message': 'App is not runnung',
+            }), 500
+
+    else:
+        return jsonify({
+            'Status': '500 Internal Server Error',
+            'Message': 'App is not runnung',
+        }), 500
 
 
 @app.route('/contact', methods=['GET', 'POST'])
@@ -99,4 +130,4 @@ def send_mail():
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=debug_mode)
