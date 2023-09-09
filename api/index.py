@@ -8,7 +8,7 @@ Website
 import smtplib
 
 import config
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_migrate import Migrate
 from models import db
 from flask_cors import CORS
@@ -26,7 +26,9 @@ db.init_app(app)
 db.app = (app)
 migrate = Migrate(app, db)
 
-CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}})
+CORS(app, resources={
+     r"/contact": {"origins": ["http://localhost:5173",
+                               "https://vivirgros.com"]}})
 
 env = config.ENV
 
@@ -36,18 +38,19 @@ env = config.ENV
 @app.route('/')
 def home():
     """ The funtion returns a 200 Ok to show app is running """
-    return {
+    return jsonify({
         'Status': '200 Ok',
         'Message': 'App is runnung',
-    }
+    })
 
 
-@app.route('/contact', methods=['POST', 'GET'])
+@app.route('/contact', methods=['GET', 'POST'])
 def send_mail():
     """ This function sends mail in contact page for Vivirgros """
-    try:
-        data = request.get_json()
 
+    data = request.get_json()
+
+    if data:
         company_name = data["companyName"]
         your_name = data["yourName"]
         phone_number = data["phoneNumber"]
@@ -59,12 +62,16 @@ def send_mail():
         This message is from Vivirgros Contact Page
 
         Message Details Below:
+
             Company Name: {company_name}
+
             Client Name: {your_name}
+
             Mobile Number: {phone_number}
+
             Email Address: {email_address}
-            Message: {project_details}
-            """
+
+            Message: {project_details}"""
 
         email = config.EMAIL_ADDRESS
         password = config.EMAIL_PASSWORD
@@ -77,18 +84,24 @@ def send_mail():
             subject = mail_subject
             body = mail_message
 
-            msg = "Subject: {}\n\n{}".format(subject, body)
+            msg = f"Subject: {subject}\n\n{body}"
 
             smtp.sendmail(email, to, msg)
 
-        return print({
-            'Message': 'Successfully Sent'
+        return jsonify({
+            'Message': 'Sent Successfully',
+            # 'Data': mail_message,
+            # 'Server': {
+            #     'Email': email,
+            #     'password': password,
+            #     'to': to
+            # }
         })
 
-    except Exception:
-        return print({
-            'Message': 'Failed to send'
-        })
+    else:
+        print(Exception)
+        # Return an error response as JSON
+        return jsonify({'Message': 'Failed to send'}), 500
 
 # @app.route('/blog')
 # def blogHome():
