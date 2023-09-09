@@ -17,8 +17,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = SECRET_KEY
 
 CORS(app, resources={
-     r"/contact": {"origins": ["http://localhost:5173",
-                               "https://vivirgros.com"]}})
+     r"/contact": {"origins": ["https://vivirgros.com"]}})
 
 # routes
 
