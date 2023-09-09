@@ -108,6 +108,6 @@ def send_mail():
 #     return 'About'
 
 
-if env:
-    if __name__ == '__main__':
-        app.run()
+# if env:
+#     if __name__ == '__main__':
+#         app.run()
