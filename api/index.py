@@ -38,7 +38,7 @@ CORS(app, resources={
 # routes
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
     """ The funtion returns a 200 Ok to show app is running """
     return jsonify({
@@ -93,22 +93,12 @@ def send_mail():
 
         return jsonify({
             'Message': 'Sent Successfully',
-            # 'Data': mail_message,
-            # 'Server': {
-            #     'Email': email,
-            #     'password': password,
-            #     'to': to
-            # }
         })
 
     else:
         print(Exception)
         # Return an error response as JSON
         return jsonify({'Message': 'Failed to send'}), 500
-
-# @app.route('/blog')
-# def blogHome():
-#     return 'About'
 
 
 if __name__ == '__main__':
