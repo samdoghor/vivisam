@@ -11,9 +11,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 
-from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, ENV,
-                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
-                     SQLALCHEMY_MODIFICATIONS_TRACKS)
+from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY,
+                     SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)
 from .models import db
 
 # configurations
@@ -33,7 +32,6 @@ CORS(app, resources={
      r"/contact": {"origins": ["http://localhost:5173",
                                "https://vivirgros.com"]}})
 
-env = ENV
 
 # routes
 
@@ -111,6 +109,5 @@ def send_mail():
 #     return 'About'
 
 
-# if env:
-#     if __name__ == '__main__':
-#         app.run()
+if __name__ == '__main__':
+    app.run()
