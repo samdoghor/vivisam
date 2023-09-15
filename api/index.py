@@ -8,6 +8,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 from .config import EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY
+from .errors import BadRequest, DataNotFound, TooManyRequest
 
 # configurations
 
@@ -24,7 +25,12 @@ CORS(app, resources={
 
 @app.route('/')
 def home():
-    return 'Hello, World!'
+    """ This function confirms the site is running """
+
+    return jsonify({
+        'code': 200,
+        'message': 'The application is running'
+    })
 
 
 @app.route('/contact', methods=['GET', 'POST'])
@@ -59,7 +65,7 @@ def send_mail():
 
             email = EMAIL_ADDRESS
             password = EMAIL_PASSWORD
-            to = EMAIL_ADDRESS
+            to_email = EMAIL_ADDRESS
 
             with smtplib.SMTP_SSL('mail.'+EMAIL_HOST, 465) as smtp:
 
@@ -70,21 +76,26 @@ def send_mail():
 
                 msg = f"Subject: {subject}\n\n{body}"
 
-                smtp.sendmail(email, to, msg)
+                smtp.sendmail(email, to_email, msg)
 
             return jsonify({
                 'Message': 'Sent Successfully',
             }), 200
 
-        except Exception:
-            print(Exception)
-            # Return an error response as JSON
-            return jsonify({'Message': 'Failed to send'}), 500
+        except BadRequest as error:
+            return jsonify({
+                'message': f"{error} occur. This is a bad request"
+            }), 400
+
+        except TooManyRequest as error:
+            return jsonify({
+                'message': f"{error} occur. There are too many request"
+            }), 429
 
     else:
-        print(Exception)
-        # Return an error response as JSON
-        return jsonify({'Message': 'Failed to send'}), 500
+        return jsonify({
+            'message': f"{DataNotFound} occur. Data not found"
+        }), 404
 
 
 if __name__ == "__main__":
