@@ -9,6 +9,8 @@ from flask_cors import CORS
 
 from .config import EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY
 from .errors import BadRequest, DataNotFound, TooManyRequest
+# from .models import db_setup
+
 
 # configurations
 
@@ -17,8 +19,12 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = SECRET_KEY
 
+# db = db_setup(app)
+
 CORS(app, resources={
-     r"/contact": {"origins": ["https://www.vivirgros.com"]}})
+     r"/contact": {"origins": ["https://www.vivirgros.com",
+                               "https://vivirgros.com",
+                               "vivirgros.com"]}})
 
 # routes
 
