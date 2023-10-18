@@ -7,9 +7,9 @@ import smtplib
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-from .config import EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY
+from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)  # noqa
 from .errors import BadRequest, DataNotFound, TooManyRequest
-# from .models import db_setup
+from .models import db_setup
 
 
 # configurations
@@ -17,9 +17,11 @@ from .errors import BadRequest, DataNotFound, TooManyRequest
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI  # noqa
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
 app.config['SECRET_KEY'] = SECRET_KEY
 
-# db = db_setup(app)
+db = db_setup(app)
 
 CORS(app, resources={
      r"/contact": {"origins": ["https://www.vivirgros.com",
