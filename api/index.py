@@ -6,11 +6,12 @@ import smtplib
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_migrate import Migrate
 
 from .config import EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY
 from .errors import BadRequest, DataNotFound, TooManyRequest
-# from .models import db_setup
 
+from .models import db
 
 # configurations
 
@@ -19,7 +20,9 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = SECRET_KEY
 
-# db = db_setup(app)
+db.app = app
+db.init_app(app)
+migrate = Migrate(app, db)
 
 CORS(app, resources={
      r"/contact": {"origins": ["https://www.vivirgros.com",
