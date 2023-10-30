@@ -8,7 +8,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_migrate import Migrate
 
-from .config import EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY
+from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)  # noqa
 from .errors import BadRequest, DataNotFound, TooManyRequest
 
 from .models import db
@@ -18,6 +18,8 @@ from .models import db
 
 app = Flask(__name__)
 
+app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI  # noqa
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
 app.config['SECRET_KEY'] = SECRET_KEY
 
 db.app = app
