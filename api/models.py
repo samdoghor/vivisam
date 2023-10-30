@@ -14,15 +14,6 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 
-# def db_setup(app):
-#     """ This function defines database setup and binds it to the app """
-
-#     db.app = app
-#     db.init_app(app)
-#     migrate = Migrate(app, db)
-#     return db
-
-
 class Author(db.Model):
     """ Author Model """
     __tablename__ = "authors"
@@ -31,6 +22,45 @@ class Author(db.Model):
     first_name = db.Column(db.String(), nullable=False)
     last_name = db.Column(db.String(), nullable=False)
     email_address = db.Column(db.String(), unique=True, nullable=False)
+    profile_picture = db.Column(db.String(), nullable=True)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+
+class Blog(db.Model):
+    """ Blog Model """
+    __tablename__ = "blogs"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(), nullable=False)
+    content = db.Column(db.String(), nullable=False)
+    thumbnail = db.Column(db.String())
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+
+class Blog_Image(db.Model):
+    """ Blog Image Model """
+    __tablename__ = "blog_images"
+
+    id = db.Column(db.Integer, primary_key=True)
+    image = db.Column(db.String(), nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+
+class Email_list(db.Model):
+    """ Email List Model """
+    __tablename__ = "email_lists"
+
+    id = db.Column(db.Integer, primary_key=True)
+    company_name = db.Column(db.String(), nullable=False)
+    customer_name = db.Column(db.String(), nullable=False)
+    email = db.Column(db.String(), nullable=False)
+    phone_name = db.Column(db.String(), nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
