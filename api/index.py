@@ -6,14 +6,16 @@ import smtplib
 
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_migrate import Migrate
 
-from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)  # noqa
-from .errors import (BadRequest, DataNotFound, TooManyRequest,
-                     Forbidden, Conflict, InternalServerError)
-
-from .models import (db, EmailListModel, AuthorModel,
-                     BlogModel, BlogContentModel, BlogImageModel)
+from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,  # noqa
+                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
+                     SQLALCHEMY_MODIFICATIONS_TRACKS)
+from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
+                     InternalServerError, TooManyRequest)
+from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
+                     EmailListModel, db)
 
 # configurations
 
@@ -27,6 +29,8 @@ app.config['SECRET_KEY'] = SECRET_KEY
 db.app = app
 db.init_app(app)
 migrate = Migrate(app, db)
+login_manager = LoginManager()
+login_manager.init_app(app)
 
 CORS(app, resources={
      r"/contact": {"origins": ["https://www.vivirgros.com",
@@ -52,33 +56,37 @@ def home():
 
 
 @app.route('/new_author', methods=['POST'])
-def new_author(first_name, last_name, email_address, profile_picture, password):  # noqa
+def new_author():  # noqa
     """ This function defines a route to create a new author """
 
     try:
+        data = request.get_json()
+
         authors = AuthorModel.query.filter_by(
-            email_address=email_address).first()
+            email_address=data['email_address']).first()
 
-        if not authors:
-            new_author = AuthorModel(
-                first_name=first_name,
-                last_name=last_name,
-                email_address=email_address,
-                profile_picture=profile_picture
-            )
-            new_author.set_password(password)
-
-            db.session.add(new_author)
-            db.session.commit()
-
-            return jsonify({
-                'Message': 'Author Created Successfully',
-            }), 200
-
-        else:
+        if 'email_address' in data == authors:
             return jsonify({
                 'Message': 'Author Already Exist'
             })
+
+        first_name = data['first_name']
+        last_name = data['last_name']
+        email_address = data['email_address']
+        profile_picture = data['profile_picture']
+
+        author = AuthorModel(first_name=first_name, last_name=last_name,
+                             email_address=email_address,
+                             profile_picture=profile_picture)
+
+        author.set_password(data['password'])
+
+        db.session.add(author)
+        db.session.commit()
+
+        return jsonify({
+            'Message': 'Author Created Successfully',
+        }), 200
 
     except Forbidden as e:
         return {
@@ -164,6 +172,7 @@ def author(id):
 # update one author
 
 @app.route('/author/<int:id>', methods=['PUT'])
+@login_required
 def update_author(id, first_name, last_name, email_address, profile_picture, password):  # noqa
     """ This function defines a route to update an existing author """
 
@@ -171,13 +180,22 @@ def update_author(id, first_name, last_name, email_address, profile_picture, pas
         author = AuthorModel.query.filter_by(id=id).first()
 
         if author:
-            update_author = AuthorModel(
-                first_name=first_name,
-                last_name=last_name,
-                email_address=email_address,
-                profile_picture=profile_picture
-            )
-            update_author.set_password(password)
+            data = request.get_json()
+
+            if 'first_name' in data:
+                author.first_name = data['first_name']
+
+            if 'last_name' in data:
+                author.last_name = data['last_name']
+
+            if 'email_address' in data:
+                author.email_address = data['email_address']
+
+            if 'profile_picture' in data:
+                author.profile_picture = data['profile_picture']
+
+            if 'password' in data:
+                author.set_password(data['password'])
 
             db.session.commit()
 
@@ -216,6 +234,7 @@ def update_author(id, first_name, last_name, email_address, profile_picture, pas
 
 
 @app.route('/author/<int:id>', methods=['DELETE'])
+@login_required
 def delete_author(id):  # noqa
     """ This function defines a route to delte an author """
 
@@ -270,32 +289,35 @@ def delete_author(id):  # noqa
 
 
 @app.route('/new_blog', methods=['POST'])
-def new_blog(id, title, feature_image, content):  # noqa
+@login_required
+def new_blog():  # noqa
     """ This function defines a route to create a new blog """
 
     try:
-        new_blog = BlogModel(
-            title=title,
-            feature_image=feature_image
-        )
-        db.session.add(new_blog)
+        data = request.get_json()
 
-        new_content = BlogContentModel(
-            blog_id=BlogModel.query.filter_by(id=id).first(),
-            content=content
-        )
-        db.session.add(new_content)
+        if 'title' and 'feature_image' not in data:
+            return jsonify({
+                'Message': 'Tile and Feature Image cannot be empty'
+            })
 
-        new_image = BlogImageModel(
-            blog_id=BlogModel.query.filter_by(id=id).first(),
-            image=content
-        )
-        db.session.add(new_image)
+        title = data['title']
+        feature_image = data['feature_image']
 
+        content = data['content']
+        image = data['image']
+
+        blog = BlogModel(title=title, feature_image=feature_image)
+        db.session.add(blog)
+
+        blogContent = BlogContentModel(blog_id=blog.id, content=content)
+        blogImage = BlogImageModel(blog_id=blog.id, image=image)
+
+        db.session.add(blogContent, blogImage)
         db.session.commit()
 
         return jsonify({
-            'Message': 'Blog Created Successfully',
+            'Message': 'Author Created Successfully',
         }), 200
 
     except Forbidden as e:
@@ -328,27 +350,25 @@ def blog(id):
     """ This function defines a route to display a blog """
 
     try:
-        authors = AuthorModel.query.filter_by(id=id).first()
+        blog = BlogModel.query.filter_by(id=id).first()
 
-        if not authors:
-
+        if not blog:
             return jsonify({
-                'Message': f'Author with id {id} was not found',
+                'Message': f'Blog with id {id} was not found',
             }), 200
 
-        else:
-            data = {
-                'id': authors.id,
-                'first_name': authors.first_name,
-                'last_name': authors.last_name,
-                'email_address': authors.email_address,
-                'profile_picture': authors.profile_picture
-            }
+        data = {
+            'id': blog.id,
+            'title': blog.title,
+            'feature_image': blog.feature_image,
+            'blog_contents': blog.blog_contents,
+            'blog_images': blog.blog_images
+        }
 
-            return jsonify({
-                'Message': f'Author with id {id} was found',
-                'Author': data
-            })
+        return jsonify({
+            'Message': f'Blog with id {id} was found',
+            'Blog': data
+        })
 
     except DataNotFound as e:
         return {
@@ -382,30 +402,37 @@ def blog(id):
 # update one blog
 
 @app.route('/blog/<int:id>', methods=['PUT'])
-def update_blog(id, first_name, last_name, email_address, profile_picture, password):  # noqa
+@login_required
+def update_blog(id):  # noqa
     """ This function defines a route to update an existing blog """
 
     try:
-        author = AuthorModel.query.filter_by(id=id).first()
+        blog = BlogModel.query.filter_by(id=id).first()
 
-        if author:
-            update_author = AuthorModel(
-                first_name=first_name,
-                last_name=last_name,
-                email_address=email_address,
-                profile_picture=profile_picture
-            )
-            update_author.set_password(password)
+        if blog:
+            data = request.get_json()
+
+            if 'title' in data:
+                blog.title = data['title']
+
+            if 'feature_image' in data:
+                blog.feature_image = data['feature_image']
+
+            if 'content' in data:
+                blog.content = data['content']
+
+            if 'image' in data:
+                blog.image = data['image']
 
             db.session.commit()
 
             return jsonify({
-                'Message': 'Author Updated Successfully',
+                'Message': 'Blog Updated Successfully',
             }), 200
 
         else:
             return jsonify({
-                'Message': 'Author Update Failed'
+                'Message': 'Blog Update Failed'
             })
 
     except Forbidden as e:
@@ -434,24 +461,25 @@ def update_blog(id, first_name, last_name, email_address, profile_picture, passw
 
 
 @app.route('/blog/<int:id>', methods=['DELETE'])
+@login_required
 def deleteblog(id):  # noqa
     """ This function defines a route to delete a blog """
 
     try:
-        authors = AuthorModel.query.filter_by(id=id).first()
+        blogs = BlogModel.query.filter_by(id=id).first()
 
-        if not authors:
+        if not blogs:
 
             return jsonify({
-                'Message': f'Author with id {id} was not found',
+                'Message': f'Blog with id {id} was not found',
             }), 200
 
         else:
-            db.session.delete(authors)
+            db.session.delete(blogs)
             db.session.commit()
 
             return jsonify({
-                'Message': f'Author with id {id} was found and was deleted',
+                'Message': f'Blog with id {id} was found and was deleted',
             })
 
     except DataNotFound as e:
@@ -481,6 +509,63 @@ def deleteblog(id):  # noqa
             'Type': e.type,
             'Message': e.message
         }
+
+
+""" Other Logics """
+# login an author
+
+
+@app.route('/login', methods=['POST'])
+def login_author():
+    """ This function defines the login method """
+
+    data = request.get_json()
+
+    if data:
+        try:
+            author_email = AuthorModel.query.filter_by(
+                email_address=data['email_address']).first()
+
+            if author_email is not None and author_email.check_password(data['password']):  # noqa
+                login_user(author_email)
+
+                return jsonify({
+                    'Message': 'Logged in Successfully',
+                }), 200
+
+        except BadRequest as error:
+            return jsonify({
+                'message': f"{error} occur. This is a bad request"
+            }), 400
+
+        except TooManyRequest as error:
+            return jsonify({
+                'message': f"{error} occur. There are too many request"
+            }), 429
+
+
+# logout an autho
+
+
+@app.route("/logout")
+@login_required
+def logout():
+    try:
+        logout_user()
+
+        return jsonify({
+            'Message': 'Logged out Successfully',
+        }), 200
+
+    except BadRequest as error:
+        return jsonify({
+            'message': f"{error} occur. This is a bad request"
+        }), 400
+
+    except TooManyRequest as error:
+        return jsonify({
+            'message': f"{error} occur. There are too many request"
+        }), 429
 
 
 """ Contact """
@@ -546,6 +631,10 @@ def send_mail():
                 )
                 db.session.add(new_customer)
                 db.session.commit()
+
+                return jsonify({
+                    'Message': 'Contact Saved Successfully',
+                }), 200
 
             return jsonify({
                 'Message': 'Sent Successfully',
