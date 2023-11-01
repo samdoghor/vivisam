@@ -20,8 +20,8 @@ from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
 
 app = Flask(__name__)
 
-allowed_origins = ["vivirgros.com", "https://www.vivirgros.com",
-                   "https://vivirgros.com"]
+allowed_origins = ["https://vivirgros.com", "https://www.vivirgros.com",
+                   "vivirgros.com"]
 
 CORS(app, resources={r"/contact": {"origins": allowed_origins}})
 
