@@ -36,8 +36,7 @@ login_manager.init_app(app)
 allowed_origins = ["https://www.vivirgros.com",
                    "https://vivirgros.com", "vivirgros.com"]
 
-# CORS(app, resources={r"/contact": {"origins": allowed_origins}})
-CORS(app, origins=allowed_origins)
+CORS(app, resources={r"/contact": {"origins": allowed_origins}})
 
 # routes
 
@@ -50,6 +49,105 @@ def home():
         'code': 200,
         'message': 'The application is running'
     })
+
+
+""" Contact """
+# send a contact message to vivirgros and save details in contact list
+
+
+@app.route('/contact', methods=['POST'])
+def send_mail():
+    """ This function sends mail in contact page for Vivirgros """
+
+    data = request.get_json()
+
+    if data:
+        try:
+            company_name = data["companyName"]
+            your_name = data["yourName"]
+            phone_number = data["phoneNumber"]
+            email_address = data["emailAddress"]
+            project_details = data["projectDetails"]
+
+            mail_subject = "A Message from Vivirgros Contact Page"
+            mail_message = f"""\
+            This message is from Vivirgros Contact Page
+
+            Message Details Below:
+
+                Company Name: {company_name}
+
+                Client Name: {your_name}
+
+                Mobile Number: {phone_number}
+
+                Email Address: {email_address}
+
+                Message: {project_details}"""
+
+            email = EMAIL_ADDRESS
+            password = EMAIL_PASSWORD
+            to_email = EMAIL_ADDRESS
+
+            with smtplib.SMTP_SSL('mail.'+EMAIL_HOST, 465) as smtp:
+
+                smtp.login(email, password)
+
+                subject = mail_subject
+                body = mail_message
+
+                msg = f"Subject: {subject}\n\n{body}"
+
+                smtp.sendmail(email, to_email, msg)
+
+            # add to customer list
+
+            try:
+
+                customer = EmailListModel.query.filter_by(
+                    email_address=email_address).first()
+
+                if not customer:
+                    new_customer = EmailListModel(
+                        company_name=company_name,
+                        customer_name=your_name,
+                        email_address=email_address,
+                        phone_number=phone_number,
+                    )
+                    db.session.add(new_customer)
+                    db.session.commit()
+
+                    return jsonify({
+                        'Message': 'Contact Saved Successfully',
+                    }), 200
+            except BadRequest as error:
+                return jsonify({
+                    'message': f"{error} occur. This is a bad request"
+                }), 400
+
+            except TooManyRequest as error:
+                return jsonify({
+                    'message': f"{error} occur. There are too many request"
+                }), 429
+
+            return jsonify({
+                'Message': 'Sent Successfully',
+            }), 200
+
+        except BadRequest as error:
+            return jsonify({
+                'message': f"{error} occur. This is a bad request"
+            }), 400
+
+        except TooManyRequest as error:
+            return jsonify({
+                'message': f"{error} occur. There are too many request"
+            }), 429
+
+    else:
+        return jsonify({
+            'message': f"{DataNotFound} occur. Data not found"
+        }), 404
 
 
 """ Authors """
@@ -567,105 +665,6 @@ def logout():
         return jsonify({
             'message': f"{error} occur. There are too many request"
         }), 429
-
-
-""" Contact """
-# send a contact message to vivirgros and save details in contact list
-
-
-@app.route('/contact', methods=['POST'])
-def send_mail():
-    """ This function sends mail in contact page for Vivirgros """
-
-    data = request.get_json()
-
-    if data:
-        try:
-            company_name = data["companyName"]
-            your_name = data["yourName"]
-            phone_number = data["phoneNumber"]
-            email_address = data["emailAddress"]
-            project_details = data["projectDetails"]
-
-            mail_subject = "A Message from Vivirgros Contact Page"
-            mail_message = f"""\
-            This message is from Vivirgros Contact Page
-
-            Message Details Below:
-
-                Company Name: {company_name}
-
-                Client Name: {your_name}
-
-                Mobile Number: {phone_number}
-
-                Email Address: {email_address}
-
-                Message: {project_details}"""
-
-            email = EMAIL_ADDRESS
-            password = EMAIL_PASSWORD
-            to_email = EMAIL_ADDRESS
-
-            with smtplib.SMTP_SSL('mail.'+EMAIL_HOST, 465) as smtp:
-
-                smtp.login(email, password)
-
-                subject = mail_subject
-                body = mail_message
-
-                msg = f"Subject: {subject}\n\n{body}"
-
-                smtp.sendmail(email, to_email, msg)
-
-            # add to customer list
-
-            try:
-
-                customer = EmailListModel.query.filter_by(
-                    email_address=email_address).first()
-
-                if not customer:
-                    new_customer = EmailListModel(
-                        company_name=company_name,
-                        customer_name=your_name,
-                        email_address=email_address,
-                        phone_number=phone_number,
-                    )
-                    db.session.add(new_customer)
-                    db.session.commit()
-
-                    return jsonify({
-                        'Message': 'Contact Saved Successfully',
-                    }), 200
-            except BadRequest as error:
-                return jsonify({
-                    'message': f"{error} occur. This is a bad request"
-                }), 400
-
-            except TooManyRequest as error:
-                return jsonify({
-                    'message': f"{error} occur. There are too many request"
-                }), 429
-
-            return jsonify({
-                'Message': 'Sent Successfully',
-            }), 200
-
-        except BadRequest as error:
-            return jsonify({
-                'message': f"{error} occur. This is a bad request"
-            }), 400
-
-        except TooManyRequest as error:
-            return jsonify({
-                'message': f"{error} occur. There are too many request"
-            }), 429
-
-    else:
-        return jsonify({
-            'message': f"{DataNotFound} occur. Data not found"
-        }), 404
 
 
 if __name__ == "__main__":
