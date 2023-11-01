@@ -20,10 +20,10 @@ from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
 
 app = Flask(__name__)
 
-allowed_origins = ["https://vivirgros.com", "https://www.vivirgros.com",
-                   "vivirgros.com"]
+allowed_origins = ["https://vivirgros.com",
+                   "https://www.vivirgros.com", "vivirgros.com"]
 
-CORS(app, resources={r"*": {"origins": allowed_origins}})
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI  # noqa
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
