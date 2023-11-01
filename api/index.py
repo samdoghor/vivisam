@@ -33,8 +33,8 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-allowed_origins = ["https://www.vivirgros.com/",
-                   "https://vivirgros.com/", "vivirgros.com/"]
+allowed_origins = ["https://www.vivirgros.com",
+                   "https://vivirgros.com", "vivirgros.com"]
 
 CORS(app, resources={r"/contact": {"origins": allowed_origins}})
 
