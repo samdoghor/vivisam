@@ -5,7 +5,7 @@ Website
 import smtplib
 
 from flask import Flask, jsonify, request
-from flask_cors import CORS
+from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_migrate import Migrate
 
@@ -570,6 +570,7 @@ def logout():
 
 
 @app.route('/contact', methods=['GET', 'POST'])
+@cross_origin(origin=allowed_origins, headers=['Content-Type', 'Authorization'])  # noqa
 def send_mail():
     """ This function sends mail in contact page for Vivirgros """
 
