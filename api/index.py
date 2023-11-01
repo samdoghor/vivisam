@@ -30,8 +30,10 @@ migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-CORS(app, resources={
-     r"/*": {"origins": ["https://www.vivirgros.com", "https://vivirgros.com", "vivirgros.com"]}})  # noqa
+allowed_origins = ["https://www.vivirgros.com",
+                   "https://vivirgros.com", "vivirgros.com"]
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 # routes
 
