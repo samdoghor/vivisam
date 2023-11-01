@@ -9,7 +9,9 @@ from flask_cors import CORS
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_migrate import Migrate
 
-from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)  # noqa
+from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,  # noqa
+                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
+                     SQLALCHEMY_MODIFICATIONS_TRACKS)
 from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
                      InternalServerError, TooManyRequest)
 from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
@@ -20,11 +22,6 @@ from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
 
 app = Flask(__name__)
 
-allowed_origins = ["https://vivirgros.com",
-                   "https://www.vivirgros.com", "vivirgros.com"]
-
-CORS(app, resources={r"/contact": {"origins": allowed_origins}})
-
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI  # noqa
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -34,6 +31,12 @@ db.init_app(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
+allowed_origins = ["https://www.vivirgros.com",
+                   "https://vivirgros.com", "vivirgros.com"]
+
+CORS(app, resources={r"/contact": {"origins": allowed_origins}})
 
 # routes
 
