@@ -5,7 +5,7 @@ Website
 import smtplib
 
 from flask import Flask, jsonify, request
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_migrate import Migrate
 
@@ -20,6 +20,11 @@ from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
 
 app = Flask(__name__)
 
+allowed_origins = ["vivirgros.com", "https://www.vivirgros.com",
+                   "https://vivirgros.com"]
+
+CORS(app, resources={r"/contact": {"origins": allowed_origins}})
+
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI  # noqa
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = SQLALCHEMY_MODIFICATIONS_TRACKS  # noqa
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -29,11 +34,6 @@ db.init_app(app)
 migrate = Migrate(app, db)
 login_manager = LoginManager()
 login_manager.init_app(app)
-
-allowed_origins = ["https://www.vivirgros.com",
-                   "https://vivirgros.com", "vivirgros.com"]
-
-CORS(app, resources={r"/contact": {"origins": allowed_origins}})
 
 # routes
 
@@ -570,7 +570,6 @@ def logout():
 
 
 @app.route('/contact', methods=['GET', 'POST'])
-@cross_origin(origin=allowed_origins, headers=['Content-Type', 'Authorization'])  # noqa
 def send_mail():
     """ This function sends mail in contact page for Vivirgros """
 
