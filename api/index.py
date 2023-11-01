@@ -12,8 +12,8 @@ from flask_migrate import Migrate
 from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD, SECRET_KEY, SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)  # noqa
 from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
                      InternalServerError, TooManyRequest)
-from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
-                     EmailListModel, db)
+from .models import (AuthorModel, BlogContentModel,
+                     BlogImageModel, BlogModel, db)
 
 # configurations
 
@@ -613,36 +613,6 @@ def send_mail():
                 msg = f"Subject: {subject}\n\n{body}"
 
                 smtp.sendmail(email, to_email, msg)
-
-            # add to customer list
-
-            try:
-
-                customer = EmailListModel.query.filter_by(
-                    email_address=email_address).first()
-
-                if not customer:
-                    new_customer = EmailListModel(
-                        company_name=company_name,
-                        customer_name=your_name,
-                        email_address=email_address,
-                        phone_number=phone_number,
-                    )
-                    db.session.add(new_customer)
-                    db.session.commit()
-
-                    return jsonify({
-                        'Message': 'Contact Saved Successfully',
-                    }), 200
-            except BadRequest as error:
-                return jsonify({
-                    'message': f"{error} occur. This is a bad request"
-                }), 400
-
-            except TooManyRequest as error:
-                return jsonify({
-                    'message': f"{error} occur. There are too many request"
-                }), 429
 
             return jsonify({
                 'Message': 'Sent Successfully',
