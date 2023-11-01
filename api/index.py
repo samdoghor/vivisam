@@ -33,8 +33,7 @@ login_manager.init_app(app)
 CORS(app, resources={
      r"/contact": {"origins": ["https://www.vivirgros.com",
                                "https://vivirgros.com",
-                               "vivirgros.com", "http://localhost:5173",
-                               "localhost:5173"]}})
+                               "vivirgros.com"]}})
 
 # routes
 
