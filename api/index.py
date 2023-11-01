@@ -31,9 +31,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 CORS(app, resources={
-     r"/contact": {"origins": ["https://www.vivirgros.com",
-                               "https://vivirgros.com",
-                               "vivirgros.com"]}})
+     r"/*": {"origins": ["https://www.vivirgros.com", "https://vivirgros.com", "vivirgros.com"]}})  # noqa
 
 # routes
 
