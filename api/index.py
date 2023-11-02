@@ -623,6 +623,10 @@ def send_mail():
 
                 smtp.sendmail(email, to_email, msg)
 
+            return jsonify({
+                'Message': 'Sent Successfully',
+            }), 200
+
             # add to customer list
 
             try:
@@ -640,9 +644,9 @@ def send_mail():
                     db.session.add(new_customer)
                     db.session.commit()
 
-                    # return jsonify({
-                    #     'Message': 'Contact Saved Successfully',
-                    # }), 200
+                    return jsonify({
+                        'Message': 'Contact Saved Successfully',
+                    }), 200
             except BadRequest as error:
                 return jsonify({
                     'message': f"{error} occur. This is a bad request"
@@ -654,7 +658,7 @@ def send_mail():
                 }), 429
 
             return jsonify({
-                'Message': 'Sent Successfully',
+                'Message': 'Message Sent and Contact Saved Successfully',
             }), 200
 
         except BadRequest as error:
