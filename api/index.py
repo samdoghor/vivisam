@@ -2,18 +2,18 @@
 This Module defines the routes of the backend for Vivirgros and Samuel Doghor
 Website
 """
+import datetime
 import smtplib
-
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-from flask_login import LoginManager, login_required, login_user, logout_user
-from flask_migrate import Migrate
 
 from config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,  # noqa
                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
                     SQLALCHEMY_MODIFICATIONS_TRACKS)
 from errors import (BadRequest, Conflict, DataNotFound, Forbidden,
                     InternalServerError, TooManyRequest)
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_migrate import Migrate
 from models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
                     EmailListModel, db)
 
@@ -47,9 +47,13 @@ CORS(app, resources={r"/*": {"origins": allowed_origins}})
 def home():
     """ This function confirms the site is running """
 
+    current_time = datetime.datetime.now()
+    formatted_time = current_time.strftime("%H:%M:%S")
+    exact_date = datetime.date.today()
+
     return jsonify({
         'code': 200,
-        'message': 'The application is running'
+        'message': f'The application started running at {formatted_time} on {exact_date}'  # noqa
     })
 
 
