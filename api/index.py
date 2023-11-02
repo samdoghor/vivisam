@@ -9,13 +9,13 @@ from flask_cors import CORS
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_migrate import Migrate
 
-from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,  # noqa
-                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
-                     SQLALCHEMY_MODIFICATIONS_TRACKS)
-from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
-                     InternalServerError, TooManyRequest)
-from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
-                     EmailListModel, db)
+from config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,  # noqa
+                    SECRET_KEY, SQLALCHEMY_DATABASE_URI,
+                    SQLALCHEMY_MODIFICATIONS_TRACKS)
+from errors import (BadRequest, Conflict, DataNotFound, Forbidden,
+                    InternalServerError, TooManyRequest)
+from models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
+                    EmailListModel, db)
 
 # configurations
 
@@ -36,7 +36,9 @@ login_manager.init_app(app)
 allowed_origins = ["https://www.vivirgros.com",
                    "https://vivirgros.com", "vivirgros.com"]
 
-CORS(app, resources={r"/contact": {"origins": allowed_origins}})
+# allowed_origins = ["localhost:5173", "http://localhost:5173"]
+
+CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
 # routes
 
