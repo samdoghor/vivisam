@@ -640,9 +640,9 @@ def send_mail():
                     db.session.add(new_customer)
                     db.session.commit()
 
-                    return jsonify({
-                        'Message': 'Contact Saved Successfully',
-                    }), 200
+                    # return jsonify({
+                    #     'Message': 'Contact Saved Successfully',
+                    # }), 200
             except BadRequest as error:
                 return jsonify({
                     'message': f"{error} occur. This is a bad request"
