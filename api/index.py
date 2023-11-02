@@ -5,16 +5,16 @@ Website
 import datetime
 import smtplib
 
-from config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,  # noqa
+from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,  # noqa
                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
                     SQLALCHEMY_MODIFICATIONS_TRACKS)
-from errors import (BadRequest, Conflict, DataNotFound, Forbidden,
+from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
                     InternalServerError, TooManyRequest)
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_migrate import Migrate
-from models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
+from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
                     EmailListModel, db)
 
 # configurations
