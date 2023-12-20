@@ -100,10 +100,11 @@ class EmailListModel(db.Model):
     __tablename__ = "email_lists"
 
     id = db.Column(db.Integer, primary_key=True)
-    company_name = db.Column(db.String(), nullable=False)
+    company_name = db.Column(db.String(), nullable=True)
     customer_name = db.Column(db.String(), nullable=False)
     email_address = db.Column(db.String(), nullable=False)
     phone_number = db.Column(db.String(), nullable=False)
+    is_vivirgros = db.Column(db.Boolean, nullable=False, default=True)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)

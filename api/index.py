@@ -7,7 +7,8 @@ import smtplib
 
 from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,
                      SECRET_KEY, SQLALCHEMY_DATABASE_URI,
-                     SQLALCHEMY_MODIFICATIONS_TRACKS)
+                     SQLALCHEMY_MODIFICATIONS_TRACKS, EMAIL_ADDRESS_SAMDOGHOR,
+                     EMAIL_HOST_SAMDOGHOR, EMAIL_PASSWORD_SAMDOGHOR)
 from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
                      InternalServerError, TooManyRequest)
 from flask import Flask, jsonify, request
@@ -33,8 +34,9 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-allowed_origins = ["https://www.vivirgros.com",
-                   "https://vivirgros.com", "vivirgros.com"]
+allowed_origins = ["https://www.vivirgros.com", "https://vivirgros.com",
+                   "vivirgros.com", "https://www.samdoghor.com",
+                   "https://samdoghor.com", "samdoghor.com"]
 
 # allowed_origins = ["localhost:5173", "http://localhost:5173"]
 
@@ -632,7 +634,7 @@ def send_mail():
             try:
 
                 customer = EmailListModel.query.filter_by(
-                    email_address=email_address).first()
+                    email_address=email_address, is_vivirgros=True).first()
 
                 if not customer:
                     new_customer = EmailListModel(
@@ -640,6 +642,106 @@ def send_mail():
                         customer_name=your_name,
                         email_address=email_address,
                         phone_number=phone_number,
+                    )
+                    db.session.add(new_customer)
+                    db.session.commit()
+
+                    return jsonify({
+                        'Message': 'Contact Saved Successfully',
+                    }), 200
+            except BadRequest as error:
+                return jsonify({
+                    'message': f"{error} occur. This is a bad request"
+                }), 400
+
+            except TooManyRequest as error:
+                return jsonify({
+                    'message': f"{error} occur. There are too many request"
+                }), 429
+
+            return jsonify({
+                'Message': 'Message Sent and Contact Saved Successfully',
+            }), 200
+
+        except BadRequest as error:
+            return jsonify({
+                'message': f"{error} occur. This is a bad request"
+            }), 400
+
+        except TooManyRequest as error:
+            return jsonify({
+                'message': f"{error} occur. There are too many request"
+            }), 429
+
+    else:
+        return jsonify({
+            'message': f"{DataNotFound} occur. Data not found"
+        }), 404
+
+
+@app.route('/contact-samdoghor', methods=['POST'])
+def send_mail_samdoghor():
+    """ This function sends mail in contact page for Samuel, Doghor """
+
+    data = request.get_json()
+
+    if data:
+        try:
+            company_name = data["companyName"]
+            your_name = data["yourName"]
+            phone_number = data["phoneNumber"]
+            email_address = data["emailAddress"]
+            project_details = data["projectDetails"]
+
+            mail_subject = "A Message from Samdoghor Contact Page"
+            mail_message = f"""\
+            This message is from Samdoghor Contact Page
+
+            Message Details Below:
+
+                Company Name: {company_name}
+
+                Client Name: {your_name}
+
+                Mobile Number: {phone_number}
+
+                Email Address: {email_address}
+
+                Message: {project_details}"""
+
+            email = EMAIL_ADDRESS_SAMDOGHOR
+            password = EMAIL_PASSWORD_SAMDOGHOR
+            to_email = EMAIL_ADDRESS_SAMDOGHOR
+
+            with smtplib.SMTP_SSL('mail.'+EMAIL_HOST_SAMDOGHOR, 465) as smtp:
+
+                smtp.login(email, password)
+
+                subject = mail_subject
+                body = mail_message
+
+                msg = f"Subject: {subject}\n\n{body}"
+
+                smtp.sendmail(email, to_email, msg)
+
+            return jsonify({
+                'Message': 'Sent Successfully',
+            }), 200
+
+            # add to customer list
+
+            try:
+
+                customer = EmailListModel.query.filter_by(
+                    email_address=email_address, is_vivirgros=False).first()
+
+                if not customer:
+                    new_customer = EmailListModel(
+                        company_name=company_name,
+                        customer_name=your_name,
+                        email_address=email_address,
+                        phone_number=phone_number,
+                        is_vivirgros=False
                     )
                     db.session.add(new_customer)
                     db.session.commit()
