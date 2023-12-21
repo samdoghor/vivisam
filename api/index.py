@@ -34,11 +34,14 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 
-# allowed_origins = ["https://www.vivirgros.com", "https://vivirgros.com",
-#                    "vivirgros.com", "https://www.samdoghor.com",
-#                    "https://samdoghor.com", "samdoghor.com"]
+allowed_origins = ["https://www.vivirgros.com",
+                   "https://vivirgros.com",
+                   "vivirgros.com",
+                   "https://www.samdoghor.com",
+                   "https://samdoghor.com",
+                   "samdoghor.com"]
 
-allowed_origins = ["localhost:5173", "http://localhost:5173"]
+# allowed_origins = ["localhost:5173", "http://localhost:5173"]
 
 CORS(app, resources={r"/*": {"origins": allowed_origins}})
 
