@@ -728,10 +728,6 @@ def send_mail_samdoghor():
 
                 smtp.sendmail(email, to_email, msg)
 
-            return jsonify({
-                'Message': 'Sent Successfully',
-            }), 200
-
             # add to customer list
 
             try:
@@ -750,9 +746,6 @@ def send_mail_samdoghor():
                     db.session.add(new_customer)
                     db.session.commit()
 
-                    return jsonify({
-                        'Message': 'Contact Saved Successfully',
-                    }), 200
             except BadRequest as error:
                 return jsonify({
                     'message': f"{error} occur. This is a bad request"
