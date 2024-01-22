@@ -691,6 +691,39 @@ def send_mail_samdoghor():
 
     if data:
         try:
+            customer = EmailListModel.query.filter_by(
+                email_address=data["emailAddress"],
+                is_vivirgros=False).first()
+
+            if customer is None:
+                new_customer = EmailListModel(
+                    company_name=data["companyName"],
+                    customer_name=data["yourName"],
+                    email_address=data["emailAddress"],
+                    phone_number=data["phoneNumber"],
+                    is_vivirgros=False
+                )
+                db.session.add(new_customer)
+                db.session.commit()
+
+                return jsonify({
+                    'Message': 'Contact Saved Successfully',
+                }), 200
+        except BadRequest as error:
+            return jsonify({
+                'message': f"{error} occur. This is a bad request"
+            }), 400
+
+        except TooManyRequest as error:
+            return jsonify({
+                'message': f"{error} occur. There are too many request"
+            }), 429
+
+        return jsonify({
+            'Message': 'Message Sent and Contact Saved Successfully',
+        }), 200
+
+        try:
             company_name = data["companyName"]
             your_name = data["yourName"]
             phone_number = data["phoneNumber"]
@@ -733,40 +766,6 @@ def send_mail_samdoghor():
             }), 200
 
             # add to customer list
-
-            try:
-
-                customer = EmailListModel.query.filter_by(
-                    email_address=data["emailAddress"],
-                    is_vivirgros=False).first()
-
-                if customer is None:
-                    new_customer = EmailListModel(
-                        company_name=data["companyName"],
-                        customer_name=data["yourName"],
-                        email_address=data["emailAddress"],
-                        phone_number=data["phoneNumber"],
-                        is_vivirgros=False
-                    )
-                    db.session.add(new_customer)
-                    db.session.commit()
-
-                    return jsonify({
-                        'Message': 'Contact Saved Successfully',
-                    }), 200
-            except BadRequest as error:
-                return jsonify({
-                    'message': f"{error} occur. This is a bad request"
-                }), 400
-
-            except TooManyRequest as error:
-                return jsonify({
-                    'message': f"{error} occur. There are too many request"
-                }), 429
-
-            return jsonify({
-                'Message': 'Message Sent and Contact Saved Successfully',
-            }), 200
 
         except BadRequest as error:
             return jsonify({
