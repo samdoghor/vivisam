@@ -638,9 +638,9 @@ def send_mail():
             try:
 
                 customer = EmailListModel.query.filter_by(
-                    email_address=email_address, is_vivirgros=True).first()
+                    email_address=email_address, is_vivirgros=True).count()
 
-                if not customer:
+                if customer < 1:
                     new_customer = EmailListModel(
                         company_name=company_name,
                         customer_name=your_name,
@@ -737,9 +737,9 @@ def send_mail_samdoghor():
             try:
 
                 customer = EmailListModel.query.filter_by(
-                    email_address=email_address, is_vivirgros=False).first()
+                    email_address=email_address, is_vivirgros=False).count()
 
-                if not customer:
+                if customer < 1:
                     new_customer = EmailListModel(
                         company_name=company_name,
                         customer_name=your_name,
