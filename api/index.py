@@ -638,9 +638,9 @@ def send_mail():
             try:
 
                 customer = EmailListModel.query.filter_by(
-                    email_address=email_address, is_vivirgros=True).count()
+                    email_address=email_address, is_vivirgros=True).first()
 
-                if customer < 1:
+                if customer is None:
                     new_customer = EmailListModel(
                         company_name=company_name,
                         customer_name=your_name,
@@ -734,23 +734,34 @@ def send_mail_samdoghor():
 
             # add to customer list
 
-            customer = EmailListModel.query.filter_by(
-                email_address=email_address, is_vivirgros=False).count()
+            try:
 
-            if customer < 1:
-                new_customer = EmailListModel(
-                    company_name=company_name,
-                    customer_name=your_name,
-                    email_address=email_address,
-                    phone_number=phone_number,
-                    is_vivirgros=False
-                )
-                db.session.add(new_customer)
-                db.session.commit()
+                customer = EmailListModel.query.filter_by(
+                    email_address=email_address, is_vivirgros=False).first()
 
+                if customer is None:
+                    new_customer = EmailListModel(
+                        company_name=company_name,
+                        customer_name=your_name,
+                        email_address=email_address,
+                        phone_number=phone_number,
+                        is_vivirgros=False
+                    )
+                    db.session.add(new_customer)
+                    db.session.commit()
+
+                    return jsonify({
+                        'Message': 'Contact Saved Successfully',
+                    }), 200
+            except BadRequest as error:
                 return jsonify({
-                    'Message': 'Contact Saved Successfully',
-                }), 200
+                    'message': f"{error} occur. This is a bad request"
+                }), 400
+
+            except TooManyRequest as error:
+                return jsonify({
+                    'message': f"{error} occur. There are too many request"
+                }), 429
 
             return jsonify({
                 'Message': 'Message Sent and Contact Saved Successfully',
