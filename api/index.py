@@ -5,18 +5,19 @@ Website
 import datetime
 import smtplib
 
-from .config import (EMAIL_ADDRESS, EMAIL_HOST, EMAIL_PASSWORD,
-                     SECRET_KEY, SQLALCHEMY_DATABASE_URI,
-                     SQLALCHEMY_MODIFICATIONS_TRACKS, EMAIL_ADDRESS_SAMDOGHOR,
-                     EMAIL_HOST_SAMDOGHOR, EMAIL_PASSWORD_SAMDOGHOR)
-from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
-                     InternalServerError, TooManyRequest)
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_migrate import Migrate
-from .models import (AuthorModel, BlogContentModel, BlogImageModel, BlogModel,
-                     EmailListModel, db)
+
+from .config import (EMAIL_ADDRESS, EMAIL_ADDRESS_SAMDOGHOR, EMAIL_HOST,
+                     EMAIL_HOST_SAMDOGHOR, EMAIL_PASSWORD,
+                     EMAIL_PASSWORD_SAMDOGHOR, SECRET_KEY,
+                     SQLALCHEMY_DATABASE_URI, SQLALCHEMY_MODIFICATIONS_TRACKS)
+from .errors import (BadRequest, Conflict, DataNotFound, Forbidden,
+                     InternalServerError, TooManyRequest)
+from .models import (AuthorModel, BlogContentModel, BlogModel, EmailListModel,
+                     db)
 
 # configurations
 
@@ -316,15 +317,15 @@ def new_blog():  # noqa
         feature_image = data['feature_image']
 
         content = data['content']
-        image = data['image']
 
         blog = BlogModel(title=title, feature_image=feature_image)
         db.session.add(blog)
 
-        blogContent = BlogContentModel(blog_id=blog.id, content=content)
-        blogImage = BlogImageModel(blog_id=blog.id, image=image)
+        # TODO: Modify Blog Creation to Match Table
 
-        db.session.add(blogContent, blogImage)
+        blogContent = BlogContentModel(blog_id=blog.id, content=content)
+
+        db.session.add(blogContent)
         db.session.commit()
 
         return jsonify({
@@ -555,7 +556,7 @@ def login_author():
             }), 429
 
 
-# logout an autho
+# logout an author
 
 
 @app.route("/logout")

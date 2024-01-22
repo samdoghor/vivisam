@@ -25,10 +25,6 @@ class AuthorModel(db.Model):
     profile_picture = db.Column(db.String(), nullable=True)
     password = db.Column(db.Integer(), nullable=False)
 
-    # relationships
-
-    blogs = db.relationship("BlogModel", backref="authors", lazy=True)
-
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
@@ -37,6 +33,14 @@ class AuthorModel(db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password, password)
+
+    # relationships
+
+    blogs = db.relationship("BlogModel", backref="authors", lazy=True)
+    content_types = db.relationship(
+        "ContentTypeModel", backref="authors", lazy=True)
+    content_tags = db.relationship(
+        "ContentTagModel", backref="authors", lazy=True)
 
 
 class BlogModel(db.Model):
@@ -47,6 +51,9 @@ class BlogModel(db.Model):
     title = db.Column(db.String(), nullable=False)
     feature_image = db.Column(db.String(), nullable=False)
 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
     # foreign_keys
 
     author_id = db.Column(db.Integer, db.ForeignKey(
@@ -56,11 +63,8 @@ class BlogModel(db.Model):
 
     blog_contents = db.relationship(
         "BlogContentModel", backref="blogs", lazy=True)
-    blog_images = db.relationship(
-        "BlogImageModel", backref="blogs", lazy=True)
-
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+    blog_tags = db.relationship(
+        "BlogContentTagsModel", backref="blogs", lazy=True)
 
 
 class BlogContentModel(db.Model):
@@ -69,30 +73,63 @@ class BlogContentModel(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(), nullable=False)
+    content_type = db.Column(db.String(), nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     # foreign_keys
 
     blog_id = db.Column(db.Integer, db.ForeignKey(
         'blogs.id'), nullable=False, unique=True)
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
-
-class BlogImageModel(db.Model):
-    """ Blog Image Model """
-    __tablename__ = "blog_images"
+class BlogContentTagsModel(db.Model):
+    """ Blog Content Tag Model """
+    __tablename__ = "blog_content_tags"
 
     id = db.Column(db.Integer, primary_key=True)
-    image = db.Column(db.String(), nullable=False)
+    tag = db.Column(db.String(), nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
 
     # foreign_keys
 
-    blod_id = db.Column(db.Integer, db.ForeignKey(
+    blog_id = db.Column(db.Integer, db.ForeignKey(
         'blogs.id'), nullable=False, unique=True)
+
+
+class ContentTypeModel(db.Model):
+    """ Content Type Model """
+    __tablename__ = "content_types"
+
+    id = db.Column(db.Integer, primary_key=True)
+    content_type = db.Column(db.String(), nullable=False)
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    # foreign_keys
+
+    author_id = db.Column(db.Integer, db.ForeignKey(
+        'authors.id'), nullable=False, unique=True)
+
+
+class ContentTagModel(db.Model):
+    """ Content Tags Model """
+    __tablename__ = "content_tags"
+
+    id = db.Column(db.Integer, primary_key=True)
+    content_tags = db.Column(db.String(), nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+    # foreign_keys
+
+    author_id = db.Column(db.Integer, db.ForeignKey(
+        'authors.id'), nullable=False, unique=True)
 
 
 class EmailListModel(db.Model):

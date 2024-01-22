@@ -8,6 +8,7 @@ Doghor Website
 
 import os
 
+import cloudinary
 from dotenv import load_dotenv
 
 # configurations
@@ -35,6 +36,8 @@ POSTGRES_HOST = os.getenv('POSTGRES_HOST')
 POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 POSTGRES_DATABASE = os.getenv('POSTGRES_DATABASE')
 
+CLOUDINARY_API_KEY = os.getenv('CLOUDINARY_API_KEY')
+CLOUDINARY_API_SECRET = os.getenv('CLOUDINARY_API_SECRET')
 
 # Enable debug mode.
 
@@ -45,3 +48,13 @@ DEBUG = True
 # SQLALCHEMY_DATABASE_URI = f'postgresql://{USER_NAME}:{PASSWORD}@{HOST}:{PORT}/{DB_NAME}'  # noqa
 SQLALCHEMY_DATABASE_URI = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{PORT}/{POSTGRES_DATABASE}'  # noqa
 SQLALCHEMY_MODIFICATIONS_TRACKS = False
+
+# cloudinary api configuration
+
+cloudinary.config(
+    cloud_name="dfmetvdvv",
+    api_key=CLOUDINARY_API_KEY,
+    api_secret=CLOUDINARY_API_SECRET
+)
+
+# TODO: add cloudianry secrets to hosting platform
