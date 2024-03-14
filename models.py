@@ -145,3 +145,19 @@ class EmailListModel(db.Model):
 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
+
+
+class Project(db.Model):
+    """ Projects Done """
+    __tablename__ = "projects"
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(), nullable=False)
+    github = db.Column(db.String(), nullable=False)
+    website = db.Column(db.String(), nullable=False)
+    description = db.Column(db.Text(), nullable=False)
+    image = db.Column(db.String(), nullable=False)
+    status = db.Column(db.String(), nullable=False)
+
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, onupdate=datetime.utcnow)
